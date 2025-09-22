@@ -1,0 +1,19 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:135.0) Gecko/20100101 Firefox/135.0" version="26.2.12">
+  <diagram name="Página-1" id="t0rvV2ZfLYzOAyFCYH4k">
+    <mxGraphModel dx="1297" dy="757" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="GFOtssNN29lRFNgziDp1-1" value="&lt;div align=&quot;center&quot;&gt;&lt;br&gt;&lt;/div&gt;" style="shape=folder;fontStyle=1;spacingTop=10;tabWidth=40;tabHeight=14;tabPosition=left;html=1;whiteSpace=wrap;align=center;" vertex="1" parent="1">
+          <mxGeometry x="230" y="130" width="310" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="GFOtssNN29lRFNgziDp1-2" value="Web Server" style="shape=folder;fontStyle=1;spacingTop=10;tabWidth=40;tabHeight=14;tabPosition=left;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="305" y="180" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="GFOtssNN29lRFNgziDp1-3" value="&lt;b&gt;Portal-Pagamentos&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="320" y="150" width="130" height="10" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

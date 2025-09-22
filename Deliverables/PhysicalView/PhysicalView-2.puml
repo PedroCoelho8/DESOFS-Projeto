@@ -1,0 +1,17 @@
+@startuml
+node "Client" as client {
+  rectangle "REST API Consumer"
+}
+
+node "Server" as app {
+  component "Portal-Pagamentos"
+}
+
+database "PostgreSQL" as db
+
+node "SMTP Server" as smtp
+
+client --> app : HTTP/REST
+app --> db
+app --> smtp : Código 2FA por e-mail
+@enduml

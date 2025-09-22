@@ -1,0 +1,99 @@
+@startuml
+
+class User{
+    - id: int;
+    - name: String;
+    - nif: NIF;
+    - email: Email;
+    - password: String;
+    - phoneNumber
+    - roles: List<Role>;
+    - bankAccounts: List<BankAccount>;
+    - dtCreated: Date;
+    - createdBy: User;
+    - dtUpdated: Date;
+    - updatedBy: User;
+    - photoPath: String;
+}
+
+class PaymentDocument{
+    - id: int;
+    - nifSender: NIF;
+    - nifReceiver: NIF;
+    - value: double;
+    - currency: String;
+    - dtCreated: Date;
+    - createdBy: User;
+    - dtUpdated: Date;
+    - updatedBy: User;
+}
+
+class Payment{
+    - id: int;
+    - paymentDocuments: HashMap<PaymentDocument, Double>;
+    - state: PaymentState;
+    - senderBankAccount: BankAccount;
+    - receiverBankAccount: BankAccount;
+    - dtCreated: Date;
+    - createdBy: User;
+    - dtUpdated: Date;
+    - updatedBy: User;
+}
+
+class BankAccount{
+    - id: int;
+    - iban: String;
+    - nifUser: NIF;
+    - swiftOrBic: String;
+    - accountType: AccountType;
+    - dtCreated: Date;
+    - createdBy: User;
+    - dtUpdated: Date;
+    - updatedBy: User;
+}
+
+class NIF{
+    - nif: String;
+}
+
+enum PaymentState{
+    - Pending
+    - Payed
+    - Confirmed To Be Paid
+    - Canceled
+}
+
+enum Role{
+    - Guest
+    - Receiver entity
+    - Sender entity
+    - Administrator
+}
+
+enum AccountType{
+    - Checking
+    - Savings
+    - Business
+    - Joint
+}
+
+User "1" -> "N" PaymentDocument
+User "1" --> "N" Payment
+User "1" --> "1" NIF
+User "1" --> "N" BankAccount
+
+Payment "1" --> "N" PaymentDocument
+Payment "1" --> "2" User
+
+PaymentDocument "1" -> "2" NIF
+Payment "1" -> "2" BankAccount
+
+BankAccount "1" --> "1" NIF
+
+PaymentState - Payment
+
+User - Role
+
+BankAccount - AccountType
+
+@enduml

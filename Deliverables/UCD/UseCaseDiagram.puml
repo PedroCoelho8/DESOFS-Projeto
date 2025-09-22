@@ -1,0 +1,42 @@
+@startuml
+
+actor Guest as G
+
+package User as U{
+    actor ReceiverEntity as R
+    actor SenderEntity as S
+    actor Administrator as A
+}
+usecase "Log into the application" as UC1
+usecase "Register in the application" as UC2
+usecase "Change personal information" as UC3
+usecase "Create a payment" as UC4
+usecase "Confirm a payment" as UC5
+usecase "Confirm a receipt" as UC6
+usecase "Reject a receipt" as UC7
+usecase "Cancel a payment" as UC8
+usecase "Cancel a receipt" as UC9
+
+G -> UC1
+
+G -> UC2
+
+U -> UC3
+
+U -> UC4
+
+S --> UC5
+A --> UC5
+
+R --> UC6
+A --> UC6
+
+R --> UC7
+A --> UC7
+
+S --> UC8
+A --> UC8
+
+R --> UC9
+A --> UC9
+@enduml

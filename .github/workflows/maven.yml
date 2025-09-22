@@ -1,0 +1,106 @@
+name: Workflow Maven CI/CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Maven Clean
+        run: mvn clean verify -DskipTests=false -Ddependency-check.skip=true
+
+      - name: Maven Compile
+        run: mvn compile
+
+      - name: Maven Test
+        run: mvn test
+
+      - name: Maven Package
+        run: mvn package
+
+      - name: OWASP Dependency-Check
+        if: false # Temporarily disabled due to NVD API key requirement
+        run: mvn org.owasp:dependency-check-maven:check -Dnvd.api.key=${{ secrets.NVD_API_KEY }} -Dnvd.api.delay=3000
+
+      - name: Upload Dependency-Check report
+        if: false # Temporarily disabled due to NVD API key requirement
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: target/dependency-check-report.html
+
+      - name: Install Gitleaks
+        run: |
+          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz | tar xz -C /usr/local/bin
+
+      - name: Run Gitleaks to detect secrets
+        run: gitleaks detect --source=. --verbose --exit-code=1
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: target/*.jar
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.java.binaries=target/classes
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+            -Dsonar.exclusions=**/Deliverables/**,**/config/**,**/test/**,**/irepositories/**,**/exceptions/**,**/*DTO.java,**/*Controller.java,**/*Factory.java,**/*Mapper.java,**/PortalPagamentos.java
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: target/
+
+      - name: Copy JAR to VM
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          source: "target/desofs2025_mon_ffs_4-1.0-SNAPSHOT.jar"
+          target: "~/desofs_app/"
+
+      - name: Restart service on VM
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          script: |
+            sudo systemctl daemon-reload
+            sudo systemctl restart desofs2025
+
+      - name: Verify app is reachable externally
+        run: |
+          for i in {1..15}; do
+            curl --fail --silent http://vsgate-http.dei.isep.ipp.pt:10840/swagger-ui/index.html && break
+            echo "App not ready yet, retrying in 10 seconds..."
+            sleep 10
+          done
